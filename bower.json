@@ -4,7 +4,7 @@
   "authors": [
     "Kunal Kundaje <kunal@kundaje.net>"
   ],
-  "description": "An address form Polymer element that offers suggestions from the Google Maps API as you type.",
+  "description": "A Polymer address form element that offers suggestions from the Google Maps API as you type.",
   "keywords": [
     "web-component",
     "web-components",
