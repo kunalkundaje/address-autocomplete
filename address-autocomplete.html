@@ -1,0 +1,137 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../google-apis/google-maps-api.html">
+<link rel="import" href="../paper-input/paper-input.html">
+
+<!--
+An address form Polymer element that offers suggestions from the Google Maps API as you type.
+
+Example:
+
+    <address-autocomplete></address-autocomplete>
+
+@demo
+-->
+<dom-module id="address-autocomplete">
+
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+    }
+  </style>
+
+  <template>
+    <google-maps-api
+      api-key="[[apiKey]]"
+      client-id="[[clientId]]"
+      version="3.exp"
+      libraries="places"
+      signed-in="false"
+      on-api-load="_mapsApiLoaded"></google-maps-api>
+
+    <paper-input id="address1Input" type="text" placeholder="" label="Street Address 1" autofocus></paper-input>
+    <paper-input id="address2Input" type="text" label="Street Address 2"></paper-input>
+    <paper-input id="cityInput" type="text" label="City"></paper-input>
+    <paper-input id="stateInput" type="text" label="State"></paper-input>
+    <paper-input id="zipCodeInput" type="text" label="ZIP Code"></paper-input>
+
+  </template>
+
+</dom-module>
+
+<script>
+
+  Polymer({
+
+    is: 'address-autocomplete',
+
+    properties: {
+      /**
+       * A Google Maps API key. To obtain an API key, see developers.google.com/maps/documentation/javascript/tutorial#api_key.
+       */
+      apiKey: String,
+
+      /**
+       * A Google Maps API for Business Client ID. To obtain a Maps API for Business Client ID, see developers.google.com/maps/documentation/business/.
+       * If set, a Client ID will take precedence over an API Key.
+       */
+      clientId: String
+    },
+
+    ready: function() {
+    },
+
+    attached: function() {
+      this._initialize();
+    },
+
+    detached: function() {
+      this.autocomplete = null;
+      window.google = null;
+    },
+
+    _mapsApiLoaded: function() {
+      this._initialize();
+    },
+
+    _initialize: function() {
+      if (!this.isAttached) {
+        return;
+      }
+      if (this.autocomplete) {
+        return;
+      }
+      if (!(window.google && window.google.maps)) {
+        return;
+      }
+      
+      var input = this.$.address1Input;
+      var options = { types: ['address'] };
+      this.autocomplete = new window.google.maps.places.Autocomplete(input, options);
+      
+      this._boundFillInAddress = this._fillInAddress.bind(this);
+      window.google.maps.event.addListener(this.autocomplete, 'place_changed', this._boundFillInAddress);
+      
+      input.addEventListener('blur', function() {
+        setTimeout(this._boundFillInAddress, 0);
+      }.bind(this));
+    },
+
+    _fillInAddress: function() {
+      var place = this.autocomplete.getPlace();
+      if (!place) {
+        return;
+      }
+
+      this.$.address1Input.value = (this._getAddressComponent(place, 'street_number', 'short_name') 
+          + ' ' + this._getAddressComponent(place, 'route', 'long_name')).trim() || place.name;
+      this.$.address2Input.value = '';
+      this.$.cityInput.value = this._getAddressComponent(place, 'locality', 'long_name');
+      this.$.stateInput.value = this._getAddressComponent(place, 'administrative_area_level_1', 'short_name');
+      this.$.zipCodeInput.value = this._getAddressComponent(place, 'postal_code', 'short_name');
+    },
+
+    _getAddressComponent: function (place, component, valueType) {
+      if (place.address_components) {
+        for (var i = 0; i < place.address_components.length; i++) {
+          var componentType = place.address_components[i].types[0];
+          if (componentType === component) {
+            return place.address_components[i][valueType];
+          }
+        }
+      }
+      return '';
+    }
+
+  });
+
+</script>
