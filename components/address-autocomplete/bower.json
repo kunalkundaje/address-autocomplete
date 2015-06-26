@@ -1,0 +1,31 @@
+{
+  "name": "address-autocomplete",
+  "version": "0.1.0",
+  "authors": [
+    "Kunal Kundaje <kunal@kundaje.net>"
+  ],
+  "description": "A Polymer address form element that offers suggestions from the Google Maps API as you type.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "address"
+  ],
+  "main": "address-autocomplete.html",
+  "license": "",
+  "homepage": "https://github.com/kunalkundaje/address-autocomplete/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "paper-input": "PolymerElements/paper-input#^1.0.0",
+    "google-apis": "GoogleWebComponents/google-apis#^1.0.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}
